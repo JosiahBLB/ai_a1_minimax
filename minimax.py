@@ -3,9 +3,6 @@ from typing import Callable, Optional
 
 
 class TwoPlayerGame():
-    MAX_PLAYER = True
-    MIN_PLAYER = False
-    player: Optional[bool]
 
     def __init__(self, depth) -> None:
         self._max_players_turn = False
