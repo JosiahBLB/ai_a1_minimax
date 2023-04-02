@@ -1,5 +1,5 @@
 from math import inf
-from .game import Game
+from .games import Game
 
 class Node:
     def __init__(self) -> None:

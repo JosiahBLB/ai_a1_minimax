@@ -1,33 +1,5 @@
 from math import inf
 import os
-
-class TicTacToe:
-    """
-    For storing game specific rules or states
-    """
-    PLAYER_1 = "X"
-    PLAYER_2 = "O"
-
-    def __init__(self, size) -> None:
-        self.board = [[" " for j in range(size)] for i in range(size)] # Initialse an empty board
-        self.player_1s_turn: bool = True
-        
-    def draw_board(self):
-        # A single method to print out the current board.
-        os.system("cls")
-        size = len(self.board)
-
-        for i in range(size):
-            if(i != 0 and i != size):
-                print("-"*((size*2)-1))
-
-            for j in range(size):
-                if(j != (size-1)):
-                    print(self.board[i][j]+"|", end="")
-                else:
-                    print(self.board[i][j])
-
-    def to_move(self):
         
 
 class Node:
