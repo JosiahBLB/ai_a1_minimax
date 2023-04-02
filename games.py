@@ -1,24 +1,26 @@
 
 import abc
+import os
 
 
 class Game(abc.ABC):
     """
     A blueprint to define the required methods and attributes in each game.
     """
-    def __init__(self) -> None:
-        self.state: list
+    # def __init__(self) -> None:
+    #     self.state: list
 
-    @abc.abstractmethod
-    def evaluate(self):
-        pass
+    # @abc.abstractmethod
+    # def evaluate(self):
+    #     pass
 
-    @abc.abstractmethod
-    def is_terminal(self):
-        pass
+    # @abc.abstractmethod
+    # def is_terminal(self):
+    #     pass
 
 class TicTacToe(Game):
-    def __init__(self) -> None:
+    def __init__(self, size) -> None:
+        self.play_game(size)
         super().__init__()
 
     @classmethod
@@ -38,6 +40,7 @@ class TicTacToe(Game):
         """
         Prints the current state of the tic tac toe board.
         """
+        os.system("cls")
         size = len(board)
         print('  ', end='')
         for col in range(size):
@@ -123,16 +126,17 @@ class TicTacToe(Game):
         print("Congratulations, Player " + winner + ", you are the winner!")
 
 class Nim(Game):
-    def __init__(self) -> None:
+    def __init__(self, rows) -> None:
+        self.play_nim(rows)
         super().__init__()
     
     def print_board(self, sticks) -> None:
+        os.system("cls")
         for i, row in enumerate(sticks):
             print(f"Row {i+1}:" + f"{'| ' * row}".center(len(sticks)+6))
 
-    def play_nim(self):
+    def play_nim(self, rows):
         # Set up the game
-        rows = int(input("Enter the number of rows you want to play with: "))
         sticks = [i+1  for i in range(rows)]
         print("Welcome to Nim! Here's the starting board:")
         self.print_board(sticks)
@@ -168,7 +172,7 @@ class Nim(Game):
     def is_game_over(self, sticks):
         return all(stick == 0 for stick in sticks)
 
-class TigersVsDogs(game):
+class TigersVsDogs(Game):
     def __init__(self) -> None:
         super().__init__()
 
@@ -177,3 +181,7 @@ class TigersVsDogs(game):
     
     def is_terminal(self):
         pass
+
+if __name__ == "__main__":
+    game = TicTacToe(3)
+    game2 = Nim(7)
