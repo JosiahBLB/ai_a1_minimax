@@ -5,24 +5,23 @@ from typing import Callable, Optional
 class TwoPlayerGame():
 
     def __init__(self, depth) -> None:
-        self._max_players_turn = False
+        self.max_players_turn = False
         self.actions_set: list = []
         self.search_depth: int = depth
 
     def to_move(self) -> bool:
-        self._max_players_turn = not self._max_players_turn
-        return self._max_players_turn
+        return not self._max_players_turn
 
     def is_terminal(self) -> bool:
-        """TwoPlayerGame has ended or depth has been reached"""
+        """No avaliable moves or depth has been reached"""
         pass
 
     def utility(self) -> int:
-        """Assigning a number to a node"""
+        """Finds the value of the terminal state"""
         pass
 
-    def eval_func(self, state, action) -> int: # 
-        """For evalutating terminal states"""
+    def eval_func(self, state, action) -> int:
+        """Scores non-terminal states"""
         pass
 
     def actions(self) -> "list[Callable]":
@@ -34,7 +33,7 @@ class NaughtsAndCrosses(TwoPlayerGame):
     def __init__(self) -> None:
         pass
 
-    def eval_func(self, state, action) -> int: # For evalutating terminal states
+    def eval_func(self, state, action) -> int:
         pass
 
     def actions(self) -> list:
@@ -49,14 +48,14 @@ class State:
     
 
 def alpha_beta_search(game: TwoPlayerGame, state: State) -> list:
-    TwoPlayerGame.player = game.to_move(state)
+    game.max_players_turn = game.to_move(state)
     state.value, move = max_value(game, state, -inf, inf)
     return move
 
 def max_value(game: TwoPlayerGame, state, alpha, beta) -> "tuple[int, Callable]":
     # Check if at Terminal node
     if game.is_terminal(state):
-        return (game.utility(state, TwoPlayerGame.player), None)
+        return (game.utility(state, game.max_players_turn), None)
     
     # Start recursive search
     value = -inf
@@ -74,7 +73,7 @@ def max_value(game: TwoPlayerGame, state, alpha, beta) -> "tuple[int, Callable]"
 def min_value(game: TwoPlayerGame, state, alpha, beta) -> "tuple[int, Callable]":
     # Check if at Terminal node
     if game.is_terminal(state):
-        return (game.utility(state, TwoPlayerGame.player), None)
+        return (game.utility(state, game.max_players_turn), None)
     
     # Start recursive search
     value = inf
