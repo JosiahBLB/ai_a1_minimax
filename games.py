@@ -1,6 +1,8 @@
 
 import abc
+import itertools
 import os
+from typing import Optional
 
 
 class Game(abc.ABC):
@@ -24,9 +26,9 @@ class TicTacToe(Game):
         super().__init__()
 
     @classmethod
-    def create_board(cls, size):
+    def create_board(cls, size: int) -> list:
         """
-        Creates a new tic tac toe board of a specified size.
+        Creates a new empty tic-tac-toe board of a specified size.
         """
         board = []
         for row in range(size):
@@ -36,9 +38,9 @@ class TicTacToe(Game):
         return board
 
     @classmethod
-    def print_board(cls, board):
+    def print_board(cls, board: list) -> None:
         """
-        Prints the current state of the tic tac toe board.
+        Prints the current state of the tic-tac-toe board.
         """
         os.system("cls")
         size = len(board)
@@ -49,24 +51,33 @@ class TicTacToe(Game):
         for row in range(size):
             print(row, end=' ')
             for col in range(size):
-                print(board[row][col], end='|')
+                if col == size-1:
+                    print(board[row][col], end='')
+                else:
+                    print(board[row][col], end='|')
             print()
             if row < size - 1:
-                print(' ', end='')
-                for i in range(size):
+                print('  ', end='')
+                for i in range(size*2-1): # Aligns horizontal lines
                     print('-', end='')
                 print()
 
     @classmethod
-    def get_move(cls, board, player):
+    def get_move(cls, board: list, player: str) -> None:
         """
         Gets a move from the player and updates the board accordingly.
+        Most of the code here is input validation.
+
+        @param board - The 2d array of the current board state.
+        @param player - The character the current player is playing as e.g. 'X'
         """
         size = len(board)
         valid_move = False
         while not valid_move:
             move = input("Player " + player + ", enter your move (row col): ")
             move = move.split()
+            
+            # Check if input format is correct
             if len(move) != 2:
                 print("Invalid input. Please enter two numbers separated by a space.")
                 continue
@@ -74,10 +85,14 @@ class TicTacToe(Game):
             if not row.isdigit() or not col.isdigit():
                 print("Invalid input. Please enter two numbers separated by a space.")
                 continue
+
+            # Check if row or column index is valid
             row, col = int(row), int(col)
             if row < 0 or row >= size or col < 0 or col >= size:
                 print("Invalid move. Please enter a row and column within the board.")
                 continue
+
+            # Check if the given space is occupied
             if board[row][col] != ' ':
                 print("That space is already taken. Please choose another.")
                 continue
@@ -85,9 +100,12 @@ class TicTacToe(Game):
         board[row][col] = player
 
     @classmethod
-    def check_win(cls, board):
+    def check_win(cls, board) -> Optional[str]:
         """
         Checks if either player has won the game.
+        
+        @param board - The 2d array of the current board state.
+        @return str - The winning character e.g. 'X'
         """
         size = len(board)
         # Check rows
@@ -103,18 +121,22 @@ class TicTacToe(Game):
             return board[0][0]
         if all(board[i][size-i-1] == board[0][size-1] and board[0][size-1] != ' ' for i in range(size)):
             return board[0][size-1]
+        # Check draw
+        for row in range(size):
+            if " " in [board[row][col] == " " for col in range(size)]:
+                return "draw"
         # No winner
         return None
 
 
-    def play_game(self, size):
+    def play_game(self, size) -> None:
         """
         Plays a game of tic tac toe on a board of the specified size.
         """
         board = self.create_board(size)
         player = 'X'
         winner = None
-        while winner is None:
+        while winner is None: # Main loop
             self.print_board(board)
             self.get_move(board, player)
             winner = self.check_win(board)
@@ -122,8 +144,14 @@ class TicTacToe(Game):
                 player = 'O'
             else:
                 player = 'X'
+
+        # Game ends 
+        os.system("cls")
         self.print_board(board)
-        print("Congratulations, Player " + winner + ", you are the winner!")
+        if winner == "draw":
+            print("It's a draw! Better luck next time.")
+        else:
+            print("Congratulations, Player " + winner + ", you are the winner!")
 
 class Nim(Game):
     def __init__(self, rows) -> None:
@@ -184,4 +212,4 @@ class TigersVsDogs(Game):
 
 if __name__ == "__main__":
     game = TicTacToe(3)
-    game2 = Nim(7)
+    # game2 = Nim(7)
