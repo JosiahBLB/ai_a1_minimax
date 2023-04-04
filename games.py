@@ -1,6 +1,5 @@
 
 import abc
-import itertools
 import os
 from typing import Optional
 
@@ -11,6 +10,10 @@ class Game(abc.ABC):
     """
     def __init__(self) -> None:
         self.state: list
+
+    @abc.abstractmethod
+    def possible_moves(self) -> list:
+        pass
 
     @abc.abstractmethod
     def evaluate(self) -> int:
@@ -25,7 +28,11 @@ class TicTacToe(Game):
         self.play_game(size)
         super().__init__()
     
-    def evaluate(self, board) -> int:
+    def possible_moves(self) -> list:
+        pass
+    
+    def evaluate(self) -> int:
+        board = self.state
         size = len(board)
 
         # Weighting of the evaluation function
@@ -45,14 +52,14 @@ class TicTacToe(Game):
             x_count = len([board[row][col] for col in range(size) if board[row][col] == "X"])
             x_occurances[x_count] += 1
 
-        #cols
+        # columns
         for col in range(board):
             o_count = len([board[row][col] for row in range(size) if board[row][col] == "O"])
             o_occurances[o_count] += 1
             x_count = len([board[row][col] for row in range(size) if board[row][col] == "X"])
             x_occurances[x_count] += 1
 
-        #diag
+        # diagonals
         o_count = len([board[i][i] for i in range(size) if board[i][i] == "O"])
         o_occurances[o_count] += 1
         x_count = len([board[i][i] for i in range(size) if board[i][i] == "X"])
@@ -72,7 +79,7 @@ class TicTacToe(Game):
         return evaluation
 
     def is_terminal(self):
-        pass
+        return (self.check_win() != None)
 
     @classmethod
     def create_board(cls, size: int) -> None:
@@ -170,9 +177,14 @@ class TicTacToe(Game):
             return board[0][0]
         if all(board[i][size-i-1] == board[0][size-1] and board[0][size-1] != ' ' for i in range(size)):
             return board[0][size-1]
+        # check draw
+        no_spaces = []
+        for row in range(size):
+            no_spaces += [board[row][col] != " " for col in range(size)]
+        if all(no_spaces):
+            return "draw"
         # No winner
         return None
-
 
     def play_game(self, size) -> None:
         """
@@ -181,8 +193,6 @@ class TicTacToe(Game):
         board = self.create_board(size)
         player = 'X'
         winner = None
-        game_length = size * size
-        turn_count = 0
         while winner is None: # Main loop
 
             self.print_board(board) 
@@ -192,9 +202,6 @@ class TicTacToe(Game):
             self.get_move(board, player) # Updates board and validation
             # TODO: else minimax(Node, depth, maximizing's turn)
             winner = self.check_win(board)
-            turn_count += 1
-            if turn_count == game_length: # Check for draw
-                winner = "draw"
             if player == 'X':
                 player = 'O'
             else:
@@ -273,5 +280,5 @@ class TigersVsDogs(Game):
         pass
 
 if __name__ == "__main__":
-    # game = TicTacToe(3)
-    game2 = Nim(10)
+    game = TicTacToe(3)
+    #game2 = Nim(50)
