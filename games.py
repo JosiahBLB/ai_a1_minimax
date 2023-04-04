@@ -13,7 +13,7 @@ class Game(abc.ABC):
         self.state: list
 
     @abc.abstractmethod
-    def evaluate(self):
+    def evaluate(self) -> int:
         pass
 
     @abc.abstractmethod
@@ -25,8 +25,51 @@ class TicTacToe(Game):
         self.play_game(size)
         super().__init__()
     
-    def evaluate(self):
-        pass
+    def evaluate(self, board) -> int:
+        size = len(board)
+
+        # Weighting of the evaluation function
+        weight = [2**i for i in range(board)]
+
+        # index of a list can be the occurances for the character 
+        # e.g 2 occurances of X in only one row is list[2] = 1
+        o_occurances = [0 for i in range(board)]
+        x_occurances = [0 for i in range(board)]
+
+        # find occurances of character:
+
+        # rows
+        for row in range(board):
+            o_count = len([board[row][col] for col in range(size) if board[row][col] == "O"])
+            o_occurances[o_count] += 1
+            x_count = len([board[row][col] for col in range(size) if board[row][col] == "X"])
+            x_occurances[x_count] += 1
+
+        #cols
+        for col in range(board):
+            o_count = len([board[row][col] for row in range(size) if board[row][col] == "O"])
+            o_occurances[o_count] += 1
+            x_count = len([board[row][col] for row in range(size) if board[row][col] == "X"])
+            x_occurances[x_count] += 1
+
+        #diag
+        o_count = len([board[i][i] for i in range(size) if board[i][i] == "O"])
+        o_occurances[o_count] += 1
+        x_count = len([board[i][i] for i in range(size) if board[i][i] == "X"])
+        x_occurances[x_count] += 1
+
+        o_count = len([board[i][size-i-1] for i in range(size) if board[i][size-i-1] == "O"])
+        o_occurances[o_count] += 1
+        x_count = len([board[i][size-i-1] for i in range(size) if board[i][size-i-1] == "X"])
+        x_occurances[x_count] += 1
+
+        #  eval = x_occurances * weights - o_occurances * weight
+        weighted_x_vals = sum([vals*weights for vals, weights in zip(weight, x_occurances)])
+        weighted_o_vals = sum([vals*weights for vals, weights in zip(weight, o_occurances)])
+
+        evaluation = weighted_x_vals - weighted_o_vals
+
+        return evaluation
 
     def is_terminal(self):
         pass
