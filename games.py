@@ -121,10 +121,6 @@ class TicTacToe(Game):
             return board[0][0]
         if all(board[i][size-i-1] == board[0][size-1] and board[0][size-1] != ' ' for i in range(size)):
             return board[0][size-1]
-        # Check draw
-        for row in range(size):
-            if " " in [board[row][col] == " " for col in range(size)]:
-                return "draw"
         # No winner
         return None
 
@@ -136,10 +132,15 @@ class TicTacToe(Game):
         board = self.create_board(size)
         player = 'X'
         winner = None
+        game_length = size * size
+        turn_count = 0
         while winner is None: # Main loop
             self.print_board(board)
             self.get_move(board, player)
             winner = self.check_win(board)
+            turn_count += 1
+            if turn_count == game_length: # Check for draw
+                winner = "draw"
             if player == 'X':
                 player = 'O'
             else:
@@ -161,7 +162,8 @@ class Nim(Game):
     def print_board(self, sticks) -> None:
         os.system("cls")
         for i, row in enumerate(sticks):
-            print(f"Row {i+1}:" + f"{'| ' * row}".center(len(sticks)+6))
+            row_index = str(i+1).rjust(3)
+            print(f"Row {row_index}:" + f"{'| ' * row}".center(len(sticks)+len(str(i))+8)) # print and centre the sticks
 
     def play_nim(self, rows):
         # Set up the game
@@ -211,5 +213,5 @@ class TigersVsDogs(Game):
         pass
 
 if __name__ == "__main__":
-    game = TicTacToe(3)
-    # game2 = Nim(7)
+    # game = TicTacToe(3)
+    game2 = Nim(10)
