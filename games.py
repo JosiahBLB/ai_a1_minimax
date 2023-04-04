@@ -9,24 +9,30 @@ class Game(abc.ABC):
     """
     A blueprint to define the required methods and attributes in each game.
     """
-    # def __init__(self) -> None:
-    #     self.state: list
+    def __init__(self) -> None:
+        self.state: list
 
-    # @abc.abstractmethod
-    # def evaluate(self):
-    #     pass
+    @abc.abstractmethod
+    def evaluate(self):
+        pass
 
-    # @abc.abstractmethod
-    # def is_terminal(self):
-    #     pass
+    @abc.abstractmethod
+    def is_terminal(self):
+        pass
 
 class TicTacToe(Game):
     def __init__(self, size) -> None:
         self.play_game(size)
         super().__init__()
+    
+    def evaluate(self):
+        pass
+
+    def is_terminal(self):
+        pass
 
     @classmethod
-    def create_board(cls, size: int) -> list:
+    def create_board(cls, size: int) -> None:
         """
         Creates a new empty tic-tac-toe board of a specified size.
         """
@@ -135,8 +141,13 @@ class TicTacToe(Game):
         game_length = size * size
         turn_count = 0
         while winner is None: # Main loop
-            self.print_board(board)
-            self.get_move(board, player)
+
+            self.print_board(board) 
+            self.state = board # Save board in instance varible for minimax
+            
+            # TODO: If player == "X":
+            self.get_move(board, player) # Updates board and validation
+            # TODO: else minimax(Node, depth, maximizing's turn)
             winner = self.check_win(board)
             turn_count += 1
             if turn_count == game_length: # Check for draw
@@ -158,6 +169,12 @@ class Nim(Game):
     def __init__(self, rows) -> None:
         self.play_nim(rows)
         super().__init__()
+    
+    def evaluate(self):
+        pass
+
+    def is_terminal(self):
+        pass
     
     def print_board(self, sticks) -> None:
         os.system("cls")
