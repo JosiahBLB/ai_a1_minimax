@@ -1,31 +1,8 @@
-
-import abc
 import os
 from typing import Optional
+from games.game_abc import Game
+from minimax import Node, minimax
 
-
-class Game(abc.ABC):
-    """
-    A blueprint to define the required methods and attributes in each game.
-    """
-    def __init__(self) -> None:
-        self.state: list
-
-    @abc.abstractmethod
-    def possible_moves(self, state: list) -> list:
-        pass
-
-    @abc.abstractmethod
-    def evaluate(self) -> int:
-        pass
-
-    @abc.abstractmethod
-    def is_terminal(self) -> bool:
-        pass
-    
-    @abc.abstractmethod
-    def update_player(cls, player) -> str:
-        pass
 
 class TicTacToe(Game):
     def __init__(self, size: int) -> None:
@@ -82,7 +59,7 @@ class TicTacToe(Game):
         x_count = len([board[i][size-i-1] for i in range(size) if board[i][size-i-1] == "X"])
         x_occurances[x_count] += 1
 
-        #  eval = x_occurances * weights - o_occurances * weight
+        # Evaluation fuction: eval = x_occurances * weights - o_occurances * weight
         weighted_x_vals = sum([vals*weights for vals, weights in zip(weight, x_occurances)])
         weighted_o_vals = sum([vals*weights for vals, weights in zip(weight, o_occurances)])
 
@@ -218,11 +195,12 @@ class TicTacToe(Game):
             self.print_board(board) 
             self.state = board # Save board in instance varible for minimax
             
-            # TODO: If player == "X":
-            self.get_move(board, player) # Updates board and validation
-            # TODO: else minimax(Node, depth, maximizing's turn)
+            if player == "X":
+                self.get_move(board, player) # Updates board and validation
+            else:
+                minimax(Node(board, player), 10, False)
             winner = self.check_win(board)
-            player = self.update_turn(player)
+            player = self.update_player(player)
 
         # Game ends 
         os.system("cls")
@@ -231,71 +209,3 @@ class TicTacToe(Game):
             print("It's a draw! Better luck next time.")
         else:
             print("Congratulations, Player " + winner + ", you are the winner!")
-
-class Nim(Game):
-    def __init__(self, rows) -> None:
-        self.play_nim(rows)
-        super().__init__()
-    
-    def evaluate(self):
-        pass
-
-    def is_terminal(self):
-        pass
-    
-    def print_board(self, sticks) -> None:
-        os.system("cls")
-        for i, row in enumerate(sticks):
-            row_index = str(i+1).rjust(3)
-            print(f"Row {row_index}:" + f"{'| ' * row}".center(len(sticks)+len(str(i))+8)) # print and centre the sticks
-
-    def play_nim(self, rows):
-        # Set up the game
-        sticks = [i+1  for i in range(rows)]
-        print("Welcome to Nim! Here's the starting board:")
-        self.print_board(sticks)
-
-        # Play the game
-        current_player = 1   # Player 1 goes first
-        while True:
-            print(f"Player {current_player}'s turn.")
-            row, num_to_remove = self.get_move(sticks)
-            sticks[row] -= num_to_remove
-            print(f"Player {current_player} takes {num_to_remove} stick(s) from row {row+1}.")
-            self.print_board(sticks)
-            if self.is_game_over(sticks):
-                print(f"Player {current_player} wins!")
-                break
-            current_player = 3 - current_player   # Switch player (1 -> 2, 2 -> 1)
-
-    def get_move(self, sticks):
-        while True:
-            row = int(input("Enter the row you want to take sticks from: ")) - 1   # Subtract 1 to convert to 0-indexed
-            if row < 0 or row >= len(sticks):
-                print(f"Invalid row. Please enter a number between 1 and {len(sticks)}.")
-                continue
-            if sticks[row] == 0:
-                print(f"There are no sticks in row {row+1}. Please choose a different row.")
-                continue
-            num_to_remove = int(input(f"Enter the number of sticks you want to take from row {row+1}: "))
-            if num_to_remove < 1 or num_to_remove > sticks[row]:
-                print(f"Invalid number of sticks. Please enter a number between 1 and {sticks[row]}.")
-                continue
-            return row, num_to_remove
-
-    def is_game_over(self, sticks):
-        return all(stick == 0 for stick in sticks)
-
-class TigersVsDogs(Game):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def evaluate(self):
-        pass 
-    
-    def is_terminal(self):
-        pass
-
-if __name__ == "__main__":
-    game = TicTacToe(3)
-    #game2 = Nim(50)

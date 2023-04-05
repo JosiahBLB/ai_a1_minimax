@@ -1,18 +1,27 @@
 from math import inf
-from games import TicTacToe, Game
+from games.game_abc import Game
+
 
 class Node:
-    def __init__(self, game) -> None:
-        self.game: Game = game
+    def __init__(self, game: Game, player: str) -> None:
+        self.game = game
+        self.state: list
+        self.player: str = self.game.update_player(player) # apon creation, players 
 
     def get_children(self) -> list: # The set of next possible moves
-        return self.children
+        moves = Game.possible_moves() # A list containing [row, col] items. These are possible moves
+        children = []
+        for move in moves: # Make a new child for each possible move
+            new_state = self.state.copy
+            new_state[move[0]][move[1]] = self.player # updating board with the new move
+            children.append(Node(new_state, self.player)) # Adding new child node to the list. Passing board state and who's turn it is
+        return children
     
     def evaluate(self) -> int: # Get the numerical value for the current state
         self.game.evaluate()
     
     def is_terminal(self) -> bool: # Player won or no more moves to play
-        pass
+        return self.game.is_terminal()
 
 def minimax(node: Node, depth: int, maximizing_player: bool):
     if (depth == 0 or node.is_terminal()):
@@ -29,5 +38,5 @@ def minimax(node: Node, depth: int, maximizing_player: bool):
         return value
     
 if __name__ == "__main__":
-    origin = Node()
-    minimax(TicTacToe(3), inf, True)
+    root = Node()
+    minimax(root, inf, True)
