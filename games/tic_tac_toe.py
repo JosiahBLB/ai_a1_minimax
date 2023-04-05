@@ -5,12 +5,8 @@ from minimax import Node, minimax
 
 
 class TicTacToe(Game):
-    def __init__(self, size: int, start: bool = False) -> None:
-        if start:
-            self.play_game(size)
-        super().__init__()
-        self.size = size
-        self.player = 'X'
+    def __init__(self, size: int) -> None:
+        self.play_game(size)
     
     """-------- Node Functions --------"""
 
@@ -74,6 +70,14 @@ class TicTacToe(Game):
     @classmethod
     def is_terminal(cls, state) -> bool:
         return (cls.check_win(state) != None)
+    
+    @classmethod
+    def update_player(cls, player) -> str:
+        if player == 'X':
+            player = 'O'
+        else:
+            player = 'X'
+        return player
 
     """-------- Game Functions --------"""
 
@@ -88,12 +92,12 @@ class TicTacToe(Game):
                 board[row].append(' ')
         return board
 
-    def print_board(self, board: list) -> None:
+    def print_board(self, state: list) -> None:
         """
         Prints the current state of the tic-tac-toe board.
         """
         os.system("cls")
-        size = len(board)
+        size = len(state)
         print('  ', end='')
         for col in range(size):
             print(col, end=' ')
@@ -102,9 +106,9 @@ class TicTacToe(Game):
             print(row, end=' ')
             for col in range(size):
                 if col == size-1:
-                    print(board[row][col], end='')
+                    print(state[row][col], end='')
                 else:
-                    print(board[row][col], end='|')
+                    print(state[row][col], end='|')
             print()
             if row < size - 1:
                 print('  ', end='')
@@ -148,39 +152,32 @@ class TicTacToe(Game):
             valid_move = True
         state[row][col] = player
 
-    def update_player(self, player) -> str:
-        if player == 'X':
-            player = 'O'
-        else:
-            player = 'X'
-        return player
-
     @classmethod
-    def check_win(cls, board) -> Optional[str]:
+    def check_win(cls, state) -> Optional[str]:
         """
         Checks if either player has won the game.
         
         @param board - The 2d array of the current board state.
         @return str - The winning character e.g. 'X'
         """
-        size = len(board)
+        size = len(state)
         # Check rows
         for row in range(size):
-            if all(board[row][col] == board[row][0] and board[row][0] != ' ' for col in range(size)):
-                return board[row][0]
+            if all(state[row][col] == state[row][0] and state[row][0] != ' ' for col in range(size)):
+                return state[row][0]
         # Check columns
         for col in range(size):
-            if all(board[row][col] == board[0][col] and board[0][col] != ' ' for row in range(size)):
-                return board[0][col]
+            if all(state[row][col] == state[0][col] and state[0][col] != ' ' for row in range(size)):
+                return state[0][col]
         # Check diagonals
-        if all(board[i][i] == board[0][0] and board[0][0] != ' ' for i in range(size)):
-            return board[0][0]
-        if all(board[i][size-i-1] == board[0][size-1] and board[0][size-1] != ' ' for i in range(size)):
-            return board[0][size-1]
+        if all(state[i][i] == state[0][0] and state[0][0] != ' ' for i in range(size)):
+            return state[0][0]
+        if all(state[i][size-i-1] == state[0][size-1] and state[0][size-1] != ' ' for i in range(size)):
+            return state[0][size-1]
         # check draw
         no_spaces = []
         for row in range(size):
-            no_spaces += [board[row][col] != " " for col in range(size)]
+            no_spaces += [state[row][col] != " " for col in range(size)]
         if all(no_spaces):
             return "draw"
         # No winner
@@ -190,21 +187,21 @@ class TicTacToe(Game):
         """
         Plays a game of tic tac toe on a board of the specified size.
         """
-        board = self.create_board(size)
+        state = self.create_board(size)
         winner = None
         player = "X"
         while winner is None: # Main loop
-            self.print_board(board) 
+            self.print_board(state) 
             if player == "X":
-                self.get_move_from_user(board, player) # Updates board and validation
+                self.get_move_from_user(state, player) # Updates board and validation
             else:
-                minimax(Node(board, player), 10, False)
-            winner = self.check_win(board)
+                minimax(Node(state, player, TicTacToe), 10, False)
+            winner = self.check_win(state)
             player = self.update_player(player)
 
         # Game ends 
         os.system("cls")
-        self.print_board(board)
+        self.print_board(state)
         if winner == "draw":
             print("It's a draw! Better luck next time.")
         else:

@@ -4,23 +4,23 @@ from games.game_abc import Game
 
 class Node:
     def __init__(self, state: list, player: str, game: Game) -> None:
-        self.game: Game = game
-        self.state: list
-        self.player: str = self.game.update_player(player) # apon creation, players 
+        self.game = game
+        self.state= state
+        self.player= self.game.update_player(player) # apon creation, players 
 
     def get_children(self) -> list: # The set of next possible moves
-        moves = self.game.possible_moves() # A list containing [row, col] items. These are possible moves
+        moves = self.game.possible_moves(self.state) # A list containing [row, col] items
         children = []
         for move in moves: # Make a new child for each possible move
             new_state = self.state.copy
             new_state[move[0]][move[1]] = self.player # updating board with the new move
-            children.append(Node(new_state, self.player)) # Adding new child node to the list. Passing board state and who's turn it is
+            children.append(Node(new_state, self.player, self.game)) # Adding new child node to the list. Passing board state and who's turn it is
         return children
     
     def evaluate(self) -> int: # Get the numerical value for the current state
         self.game.evaluate()
     
-    def is_terminal(self) -> bool: # Player won or no more moves to play
+    def is_terminal(self) -> bool: # Player has won or no more moves to play
         return self.game.is_terminal(self.state)
 
 def minimax(node: Node, depth: int, maximizing_player: bool):
