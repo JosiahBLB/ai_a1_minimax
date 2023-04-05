@@ -3,13 +3,13 @@ from games.game_abc import Game
 
 
 class Node:
-    def __init__(self, game: Game, player: str) -> None:
-        self.game = game
+    def __init__(self, state: list, player: str, game: Game) -> None:
+        self.game: Game = game
         self.state: list
         self.player: str = self.game.update_player(player) # apon creation, players 
 
     def get_children(self) -> list: # The set of next possible moves
-        moves = Game.possible_moves() # A list containing [row, col] items. These are possible moves
+        moves = self.game.possible_moves() # A list containing [row, col] items. These are possible moves
         children = []
         for move in moves: # Make a new child for each possible move
             new_state = self.state.copy
@@ -21,7 +21,7 @@ class Node:
         self.game.evaluate()
     
     def is_terminal(self) -> bool: # Player won or no more moves to play
-        return self.game.is_terminal()
+        return self.game.is_terminal(self.state)
 
 def minimax(node: Node, depth: int, maximizing_player: bool):
     if (depth == 0 or node.is_terminal()):
@@ -36,7 +36,3 @@ def minimax(node: Node, depth: int, maximizing_player: bool):
         for child in node.get_children():
             value = min(value, minimax(child, depth - 1, True))
         return value
-    
-if __name__ == "__main__":
-    root = Node()
-    minimax(root, inf, True)

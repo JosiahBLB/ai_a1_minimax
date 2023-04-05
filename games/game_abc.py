@@ -18,7 +18,3 @@ class Game(abc.ABC):
     @abc.abstractmethod
     def is_terminal(self) -> bool:
         pass
-    
-    @abc.abstractmethod
-    def update_player(cls, player) -> str:
-        pass

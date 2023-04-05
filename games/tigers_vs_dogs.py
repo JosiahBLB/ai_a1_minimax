@@ -6,7 +6,9 @@ class TigersVsDogs(Game):
         super().__init__()
 
     def evaluate(self):
+        #
         pass 
     
     def is_terminal(self):
+        #
         pass
