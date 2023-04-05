@@ -12,7 +12,7 @@ class Game(abc.ABC):
         self.state: list
 
     @abc.abstractmethod
-    def possible_moves(self) -> list:
+    def possible_moves(self, state: list) -> list:
         pass
 
     @abc.abstractmethod
@@ -20,16 +20,28 @@ class Game(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def is_terminal(self):
+    def is_terminal(self) -> bool:
+        pass
+    
+    @abc.abstractmethod
+    def update_player(cls, player) -> str:
         pass
 
 class TicTacToe(Game):
-    def __init__(self, size) -> None:
+    def __init__(self, size: int) -> None:
         self.play_game(size)
         super().__init__()
+        self.size = size
+        self.player = 'X'
     
-    def possible_moves(self) -> list:
-        pass
+    def possible_moves(self, state) -> list:
+        """
+        For use with minimax algorithum
+        """
+        possible_moves = []
+        for row in range(self.size):
+            possible_moves += [[row, col] for col in range(self.size) if state[row][col] == " "]
+        return possible_moves
     
     def evaluate(self) -> int:
         board = self.state
@@ -78,7 +90,7 @@ class TicTacToe(Game):
 
         return evaluation
 
-    def is_terminal(self):
+    def is_terminal(self) -> bool:
         return (self.check_win() != None)
 
     @classmethod
@@ -119,7 +131,7 @@ class TicTacToe(Game):
                 print()
 
     @classmethod
-    def get_move(cls, board: list, player: str) -> None:
+    def get_move(cls, state: list, player: str) -> None:
         """
         Gets a move from the player and updates the board accordingly.
         Most of the code here is input validation.
@@ -127,7 +139,7 @@ class TicTacToe(Game):
         @param board - The 2d array of the current board state.
         @param player - The character the current player is playing as e.g. 'X'
         """
-        size = len(board)
+        size = len(state)
         valid_move = False
         while not valid_move:
             move = input("Player " + player + ", enter your move (row col): ")
@@ -149,11 +161,19 @@ class TicTacToe(Game):
                 continue
 
             # Check if the given space is occupied
-            if board[row][col] != ' ':
+            if state[row][col] != ' ':
                 print("That space is already taken. Please choose another.")
                 continue
             valid_move = True
-        board[row][col] = player
+        state[row][col] = player
+
+    @classmethod
+    def update_player(cls, player) -> str:
+        if player == 'X':
+            player = 'O'
+        else:
+            player = 'X'
+        return player
 
     @classmethod
     def check_win(cls, board) -> Optional[str]:
@@ -191,8 +211,8 @@ class TicTacToe(Game):
         Plays a game of tic tac toe on a board of the specified size.
         """
         board = self.create_board(size)
-        player = 'X'
         winner = None
+        player = self.player
         while winner is None: # Main loop
 
             self.print_board(board) 
@@ -202,10 +222,7 @@ class TicTacToe(Game):
             self.get_move(board, player) # Updates board and validation
             # TODO: else minimax(Node, depth, maximizing's turn)
             winner = self.check_win(board)
-            if player == 'X':
-                player = 'O'
-            else:
-                player = 'X'
+            player = self.update_turn(player)
 
         # Game ends 
         os.system("cls")
