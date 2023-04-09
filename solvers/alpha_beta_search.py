@@ -24,7 +24,6 @@ class Node:
         return self.solver.is_terminal(self.state)
     
 def alpha_beta_search(node:Node) -> List[list]:
-    """ vap = value action pair """
     value, action = max_val(node, -inf, inf) if(node.max_players_turn) else min_val(node, -inf, inf)
     return action
 
