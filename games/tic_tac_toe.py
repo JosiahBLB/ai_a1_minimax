@@ -150,7 +150,7 @@ class TicTacToe():
         while winner is None: # Main loop
             self.print_board(state)
             if n_computers == 2:
-                    alpha_beta_search(Node(state, player, TicTacToeSolver))
+                    action = alpha_beta_search(Node(state, player, TicTacToeSolver))
                     state[action[0]][action[1]] = player
             elif n_computers == 1:
                 if player == "X":
