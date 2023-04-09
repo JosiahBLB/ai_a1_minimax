@@ -1,17 +1,18 @@
 import abc
+from typing import Tuple
 
-class Game(abc.ABC):
+class Solver(abc.ABC):
     """
     A blueprint to define the required methods and attributes in each game.
     """
 
     @abc.abstractclassmethod
-    def possible_moves(self, state: list) -> list:
+    def possible_actions(cls, state: list) -> list:
         """A list of all available moves"""
         pass
 
     @abc.abstractclassmethod
-    def evaluate(self, state: list) -> int:
+    def evaluate(cls, state: list) -> int:
         """Determines the value of the given state"""
         pass
 
@@ -21,6 +22,6 @@ class Game(abc.ABC):
         pass
 
     @abc.abstractclassmethod
-    def update_player(cls, player: str) -> str:
+    def next_player(cls, player: str) -> Tuple[str, bool]:
         """The character used to represent a player, updated to the next player"""
         pass

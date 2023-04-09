@@ -1,19 +1,9 @@
 import os
-from games.game_abc import Game
 
 
-class Nim(Game):
+class Nim():
     def __init__(self, rows) -> None:
         self.play_nim(rows)
-        super().__init__()
-    
-    def evaluate(self):
-        # TODO: Make evaluation function for Nim
-        pass
-
-    def is_terminal(self):
-        # TODO: determine if all rows are empty
-        pass
     
     def print_board(self, sticks) -> None:
         os.system("cls")

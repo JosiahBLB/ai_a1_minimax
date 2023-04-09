@@ -1,4 +1,4 @@
-from games.game_abc import Game
+from solvers.solver_abc import Game
 
 
 class TigersVsDogs(Game):

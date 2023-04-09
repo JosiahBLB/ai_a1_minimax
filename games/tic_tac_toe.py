@@ -1,85 +1,42 @@
 import os
-from typing import Optional
-from games.game_abc import Game
-from minimax import Node, minimax
+from typing import Optional, Tuple
+from solvers.alpha_beta_search import Node, alpha_beta_search
+from solvers.tick_tac_toe_solver import TicTacToeSolver
 
+class TicTacToe():
+    def __init__(self) -> None:
+        size, n_computers = self.game_init()
+        self.play_game(size, n_computers)
 
-class TicTacToe(Game):
-    def __init__(self, size: int) -> None:
-        self.play_game(size)
-    
-    """-------- Node Functions --------"""
+    def game_init(self) -> Tuple[int, int]:
+        valid_input = False
+        while not valid_input:
+            n_computers = input("Enter the number of computer players (max 2):")
+            if len(n_computers) != 1:
+                print("Please enter a valid number 0 to 2")
+                continue
+            if not n_computers.isdigit():
+                print("Please enter a number")
+                continue
+            n_computers = int(n_computers)
+            if n_computers < 0 and n_computers > 2:
+                print("Please enter a valid number 0 to 2")
+                continue
+            valid_input = True
+        
+        valid_input = False
+        while not valid_input:
+            size = input("Enter the board size (n): ")
+            if not size.isdigit():
+                print("Please enter a single number")
+                continue
+            size = int(size)
+            if size < 1:
+                print("Please enter a number greater than 0")
+                continue
+            valid_input = True
 
-    @classmethod
-    def possible_moves(cls, state) -> list:
-        """
-        Returns a list of [row, col] elements
-        """
-        possible_moves = []
-        for row in range(len(state)):
-            possible_moves += [[row, col] for col in range(len(state)) if state[row][col] == " "]
-        return possible_moves
-    
-    @classmethod
-    def evaluate(cls, state) -> int:
-        size = len(state)
-
-        # Weighting of the evaluation function
-        weight = [2**i for i in range(state)]
-
-        # index of a list can be the occurances for the character 
-        # e.g 2 occurances of X in only one row is list[2] = 1
-        o_occurances = [0 for i in range(state)]
-        x_occurances = [0 for i in range(state)]
-
-        # find occurances of character:
-
-        # rows
-        for row in range(state):
-            o_count = len([state[row][col] for col in range(size) if state[row][col] == "O"])
-            o_occurances[o_count] += 1
-            x_count = len([state[row][col] for col in range(size) if state[row][col] == "X"])
-            x_occurances[x_count] += 1
-
-        # columns
-        for col in range(state):
-            o_count = len([state[row][col] for row in range(size) if state[row][col] == "O"])
-            o_occurances[o_count] += 1
-            x_count = len([state[row][col] for row in range(size) if state[row][col] == "X"])
-            x_occurances[x_count] += 1
-
-        # diagonals
-        o_count = len([state[i][i] for i in range(size) if state[i][i] == "O"])
-        o_occurances[o_count] += 1
-        x_count = len([state[i][i] for i in range(size) if state[i][i] == "X"])
-        x_occurances[x_count] += 1
-
-        o_count = len([state[i][size-i-1] for i in range(size) if state[i][size-i-1] == "O"])
-        o_occurances[o_count] += 1
-        x_count = len([state[i][size-i-1] for i in range(size) if state[i][size-i-1] == "X"])
-        x_occurances[x_count] += 1
-
-        # Evaluation fuction: eval = x_occurances * weights - o_occurances * weight
-        weighted_x_vals = sum([vals*weights for vals, weights in zip(weight, x_occurances)])
-        weighted_o_vals = sum([vals*weights for vals, weights in zip(weight, o_occurances)])
-
-        evaluation = weighted_x_vals - weighted_o_vals
-
-        return evaluation
-
-    @classmethod
-    def is_terminal(cls, state) -> bool:
-        return (cls.check_win(state) != None)
-    
-    @classmethod
-    def update_player(cls, player) -> str:
-        if player == 'X':
-            player = 'O'
-        else:
-            player = 'X'
-        return player
-
-    """-------- Game Functions --------"""
+        return size, n_computers
 
     def create_board(self, size: int) -> list:
         """
@@ -183,7 +140,7 @@ class TicTacToe(Game):
         # No winner
         return None
 
-    def play_game(self, size) -> None:
+    def play_game(self, size, n_computers) -> None:
         """
         Plays a game of tic tac toe on a board of the specified size.
         """
@@ -191,13 +148,23 @@ class TicTacToe(Game):
         winner = None
         player = "X"
         while winner is None: # Main loop
-            self.print_board(state) 
-            if player == "X":
-                self.get_move_from_user(state, player) # Updates board and validation
+            self.print_board(state)
+            if n_computers == 2:
+                    alpha_beta_search(Node(state, player, TicTacToeSolver))
+                    state[action[0]][action[1]] = player
+            elif n_computers == 1:
+                if player == "X":
+                    self.get_move_from_user(state, player)
+                else:
+                    action =  alpha_beta_search(Node(state, "X", TicTacToeSolver))
+                    state[action[0]][action[1]] = player
             else:
-                minimax(Node(state, player, TicTacToe), 10, False)
+                self.get_move_from_user(state, player)
             winner = self.check_win(state)
-            player = self.update_player(player)
+            if player == 'X':
+                player = 'O'
+            else:
+                player = 'X'
 
         # Game ends 
         os.system("cls")
